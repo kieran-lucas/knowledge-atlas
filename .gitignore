@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.pnpm-store/
+/src-tauri/target/
+/desktop-backups/
+/src-tauri/gen/schemas/
+/docs/desktop-artifact.json
+/docs/desktop-smoke-report.json

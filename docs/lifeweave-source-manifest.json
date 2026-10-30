@@ -1,0 +1,121 @@
+{
+  "sourceCommit": "412e708333f838ff05989e78f836da488e5ba4a4",
+  "files": [
+    {
+      "source": "frontend/src/features/life/lifeTreeLayout.ts",
+      "target": "src/lifeweave/features/life/lifeTreeLayout.ts",
+      "sha256": "9096892b8230dad8ba76c0e5e3998f4d92aa9232315cf30fcd00e91d55c50f07",
+      "mode": "byte-for-byte"
+    },
+    {
+      "source": "frontend/src/features/life/LifeEditWorkspace.css.ts",
+      "target": "src/lifeweave/features/life/LifeEditWorkspace.css.ts",
+      "sha256": "7d23595bbd157bb261fad9d3b85eaed8325ade46b0ef20d82fb9a6a65ffb3058",
+      "mode": "byte-for-byte"
+    },
+    {
+      "source": "frontend/src/features/life/LifeScreen.css.ts",
+      "target": "src/lifeweave/features/life/LifeScreen.css.ts",
+      "sha256": "502776589fd8151bd49b5c506824f75911cda8ab15d028a171b7297e779b5572",
+      "mode": "byte-for-byte"
+    },
+    {
+      "source": "frontend/src/design-system/global.css",
+      "target": "src/lifeweave/design-system/global.css",
+      "sha256": "5ec52b4b0069c3cb6e9c7d23d23734a9adddae7ed544cd53ae0dabfd6fd12a96",
+      "mode": "byte-for-byte"
+    },
+    {
+      "source": "frontend/src/design-system/visual/typography.css.ts",
+      "target": "src/lifeweave/design-system/visual/typography.css.ts",
+      "sha256": "ba05f1a446421a5597fef710d1d870860d913c5f08323e61b58fde258289cb44",
+      "mode": "byte-for-byte"
+    },
+    {
+      "source": "frontend/src/design-system/visual/globalType.css.ts",
+      "target": "src/lifeweave/design-system/visual/globalType.css.ts",
+      "sha256": "18f4724a51bc6db51b9ffb3060ddadaf5e7f0413ac4dc29ba22bcc4e65f0037a",
+      "mode": "byte-for-byte"
+    },
+    {
+      "source": "frontend/src/features/life/lifeIconCatalog.ts",
+      "target": "src/lifeweave/features/life/lifeIconCatalog.ts",
+      "sha256": "116e00781d7f9aed3768b5073f804e503f1eb1c7fd370771e4b3fd52ef561bda",
+      "mode": "byte-for-byte"
+    },
+    {
+      "source": "frontend/src/features/life/lifeDirectionConfidence.ts",
+      "target": "src/lifeweave/features/life/lifeDirectionConfidence.ts",
+      "sha256": "c18514fcaa14ea30976bb2fa211eb5f52658e14fee31055f39b67658901d8ea8",
+      "mode": "byte-for-byte"
+    },
+    {
+      "source": "frontend/src/features/tag/TagChipList.tsx",
+      "target": "src/lifeweave/features/tag/TagChipList.tsx",
+      "sha256": "903a1626f65f290ea475650dc83e72291bc92c7cb79e65c2a76115009a9c710e",
+      "mode": "byte-for-byte"
+    },
+    {
+      "source": "frontend/src/features/tag/TagChipList.css.ts",
+      "target": "src/lifeweave/features/tag/TagChipList.css.ts",
+      "sha256": "92f13fb2191a37c39bb8457e467d3d03a64803d8a994a08bdaa1dcc69c5fdefe",
+      "mode": "byte-for-byte"
+    },
+    {
+      "source": "frontend/src/design-system/primitives/utilities.css.ts",
+      "target": "src/lifeweave/design-system/primitives/utilities.css.ts",
+      "sha256": "bf8c8b3f41ea18e637b5d946fdf0994d2efbce5762d9c62858110c52a2822be0",
+      "mode": "byte-for-byte"
+    },
+    {
+      "source": "frontend/src/design-system/visual/contract.css.ts",
+      "target": "src/lifeweave/design-system/visual/contract.css.ts",
+      "sha256": "eca3eec48e9b02430c029f09f5bd4774a6fe15ed720e82a4e0d6b94f32c9d6f7",
+      "mode": "byte-for-byte"
+    },
+    {
+      "source": "frontend/src/design-system/visual/lightTheme.css.ts",
+      "target": "src/lifeweave/design-system/visual/lightTheme.css.ts",
+      "sha256": "bb11a599be05cf3b354afe969a6f4ad2b7968f0903dc1dc3bdf312968193448c",
+      "mode": "byte-for-byte"
+    },
+    {
+      "source": "frontend/src/design-system/visual/theme.css.ts",
+      "target": "src/lifeweave/design-system/visual/theme.css.ts",
+      "sha256": "ca1b8c2cc16579424cfdb8861a42acdd55ca295acbda4245b4a8798d3e53fa01",
+      "mode": "byte-for-byte"
+    },
+    {
+      "source": "frontend/src/design-system/visual/motion.css.ts",
+      "target": "src/lifeweave/design-system/visual/motion.css.ts",
+      "sha256": "d793c727bb0d6a489c37e4272558054d24c9fda35dc6b9545eaaa8dd57e9337b",
+      "mode": "byte-for-byte"
+    },
+    {
+      "source": "frontend/src/design-system/visual/icons.tsx",
+      "target": "src/lifeweave/design-system/visual/icons.tsx",
+      "sha256": "21094b12cea00304de986ab45ae9a17b1a8b9d86a1d76adf636dca47e2e752e9",
+      "mode": "byte-for-byte"
+    },
+    {
+      "source": "frontend/src/ipc/generated/LifeEditNodeView.ts",
+      "target": "src/lifeweave/ipc/generated/LifeEditNodeView.ts",
+      "sha256": "23a3b6fcf2647bd46337f59d640b7bee772021a94311781203223498d4357b5a",
+      "mode": "byte-for-byte"
+    },
+    {
+      "source": "frontend/src/ipc/generated/TagSummaryView.ts",
+      "target": "src/lifeweave/ipc/generated/TagSummaryView.ts",
+      "sha256": "a7b5e67df6f6b95847981ea19848574142f166709cb14330b9bd850fc6ceb0cf",
+      "mode": "byte-for-byte"
+    },
+    {
+      "source": "frontend/src/features/life/LifeEditWorkspace.tsx",
+      "snapshot": "vendor/lifeweave/LifeEditWorkspace.tsx",
+      "target": "src/lifeweave/features/life/LifeEditWorkspace.tsx",
+      "sourceSha256": "0034b2a2c0bf5e76aac4d1c575432ee8e955f81a7be1f871c990154afc729549",
+      "targetSha256": "94b66c964fb4a740405a1adaf124353dcd8411f2209d8d1888c92bb33d9b2b6c",
+      "mode": "extracted source with data/state slots; upstream camera handlers retained"
+    }
+  ]
+}

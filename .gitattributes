@@ -1,0 +1,14 @@
+* text=auto eol=lf
+
+# Preserve the exact upstream bytes recorded by the source manifest.
+src/lifeweave/** -text whitespace=trailing-space,space-before-tab,cr-at-eol
+vendor/lifeweave/** -text whitespace=trailing-space,space-before-tab,cr-at-eol
+
+*.png binary
+*.ico binary
+*.icns binary
+*.pdf binary
+
+# Raw PDF extraction and generated patch retain source whitespace.
+docs/syllabus-extracted.txt -whitespace
+docs/lifeweave-renderer.diff -whitespace
