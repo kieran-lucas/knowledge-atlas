@@ -1,0 +1,17 @@
+[
+  {
+    "mode": "default",
+    "domAndStylesMatch": true,
+    "pngBytesMatch": true
+  },
+  {
+    "mode": "selected",
+    "domAndStylesMatch": true,
+    "pngBytesMatch": false
+  },
+  {
+    "mode": "actions",
+    "domAndStylesMatch": true,
+    "pngBytesMatch": false
+  }
+]

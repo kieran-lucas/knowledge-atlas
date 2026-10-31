@@ -23,8 +23,9 @@ try {
     }
     Copy-Item -LiteralPath $binary -Destination $destination -Force
     $artifact = Get-Item -LiteralPath $destination
+    $config = Get-Content -LiteralPath (Join-Path $workspace 'src-tauri\tauri.conf.json') -Raw | ConvertFrom-Json
     $info = [ordered]@{
-        product = 'Knowledge Atlas'; version = '1.0.0'; path = $artifact.FullName
+        product = 'Knowledge Atlas'; version = $config.version; path = $artifact.FullName
         bytes = $artifact.Length; sha256 = (Get-FileHash -LiteralPath $destination -Algorithm SHA256).Hash
         publishedAt = (Get-Date).ToUniversalTime().ToString('o')
     }

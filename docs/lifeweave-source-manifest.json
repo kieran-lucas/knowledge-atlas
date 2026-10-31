@@ -114,7 +114,7 @@
       "snapshot": "vendor/lifeweave/LifeEditWorkspace.tsx",
       "target": "src/lifeweave/features/life/LifeEditWorkspace.tsx",
       "sourceSha256": "0034b2a2c0bf5e76aac4d1c575432ee8e955f81a7be1f871c990154afc729549",
-      "targetSha256": "94b66c964fb4a740405a1adaf124353dcd8411f2209d8d1888c92bb33d9b2b6c",
+      "targetSha256": "a3145a504e3f0ae29508df15997217edd780bc2ba6568fe0be3cc152a84e3a9b",
       "mode": "extracted source with data/state slots; upstream camera handlers retained"
     }
   ]

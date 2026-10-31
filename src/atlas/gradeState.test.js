@@ -1,0 +1,21 @@
+import {describe,it,expect} from 'vitest';
+import {createGradeState,adjustGrade,undoGrade,redoGrade,canUndoGrade,canRedoGrade,HISTORY_LIMIT} from './gradeState';
+import {masteryLevel} from './masteryLevels';
+import {nodeScore} from '../scoring';
+import {byId} from '../curriculum';
+import {validateData,exportScores} from '../persistence';
+const A='spho.I.1',B='spho.VI.2',t1='2026-10-31T00:00:00.000Z',t2='2026-10-31T00:01:00.000Z';
+const entry=(score,updatedAt=t1)=>({score,assessed:true,updatedAt});
+describe('leaf grade commands',()=>{
+ it('distinguishes the first + and − from unassessed',()=>{expect(adjustGrade(createGradeState(),A,1,t1).scores[A].score).toBe(1);expect(adjustGrade(createGradeState(),A,-1,t1).scores[A].score).toBe(0)});
+ it('rejects parents, unknown IDs and steps other than exactly one',()=>{for(const id of ['spho','mechanics','missing'])expect(()=>adjustGrade(createGradeState(),id,1,t1)).toThrow();for(const delta of [0,2,-2,10])expect(()=>adjustGrade(createGradeState(),A,delta,t1)).toThrow()});
+ it('makes boundary attempts true no-ops without a timestamp or history edit',()=>{const zero=createGradeState({[A]:entry(0)}),full=createGradeState({[A]:entry(100)});expect(adjustGrade(zero,A,-1,t2)).toBe(zero);expect(adjustGrade(full,A,1,t2)).toBe(full);expect(full.scores[A].updatedAt).toBe(t1)});
+ it('restores unassessed and ancestor coverage when undoing a first assessment',()=>{const marked=adjustGrade(createGradeState(),A,-1,t1);expect(nodeScore(byId.get('spho'),marked.scores).coverage).toBe(1/76);const undone=undoGrade(marked,A);expect(undone.scores[A]).toBeUndefined();expect(nodeScore(byId.get('spho'),undone.scores)).toMatchObject({mastery:null,coverage:0});expect(redoGrade(undone,A).scores[A].score).toBe(0)});
+ it('undoes and redoes exact prior snapshots including timestamps',()=>{const initial=createGradeState({[A]:entry(64)}),marked=adjustGrade(initial,A,1,t2),undone=undoGrade(marked,A);expect(undone.scores[A]).toEqual(entry(64));expect(redoGrade(undone,A).scores[A]).toEqual(entry(65,t2));expect(initial.scores[A]).toEqual(entry(64));expect(initial.history).toEqual({})});
+ it('keeps undo and redo independent for every leaf',()=>{let state=adjustGrade(createGradeState(),A,1,t1);state=adjustGrade(state,B,1,t2);state=undoGrade(state,A);expect(state.scores[A]).toBeUndefined();expect(state.scores[B].score).toBe(1);expect(canRedoGrade(state,A)).toBe(true);expect(canUndoGrade(state,B)).toBe(true);expect(undoGrade(state,B).scores).toEqual({})});
+ it('clears the selected leaf redo branch after a new adjustment',()=>{let state=adjustGrade(createGradeState(),A,1,t1);state=undoGrade(state,A);state=adjustGrade(state,A,-1,t2);expect(state.scores[A].score).toBe(0);expect(canRedoGrade(state,A)).toBe(false);expect(redoGrade(state,A)).toBe(state)});
+ it('bounds history and serializes rapid commands without losing increments',()=>{let state=createGradeState();for(let i=0;i<10;i++)state=adjustGrade(state,A,1,t1);expect(state.scores[A].score).toBe(10);for(let i=0;i<HISTORY_LIMIT+10;i++)state=adjustGrade(state,A,i%2?1:-1,t2);expect(state.history[A].past).toHaveLength(HISTORY_LIMIT)});
+ it('starts imported progress with a fresh history and keeps schema v1 round trips',()=>{const state=undoGrade(adjustGrade(createGradeState(),A,1,t1),A);expect(validateData(JSON.parse(exportScores(state.scores)))).toEqual({});const imported=createGradeState(validateData({schemaVersion:1,scores:{[A]:entry(64)}}));expect(canUndoGrade(imported,A)).toBe(false);expect(undoGrade(imported,A).scores[A].score).toBe(64)});
+ it('keeps supplementary grades and their undo outside official mastery',()=>{let state=adjustGrade(createGradeState({[A]:entry(80)}),'geo.GH.10',1,t1);expect(nodeScore(byId.get('spho'),state.scores).mastery).toBe(80);state=undoGrade(state,'geo.GH.10');expect(nodeScore(byId.get('spho'),state.scores).mastery).toBe(80)});
+});
+describe('grade display boundaries',()=>{it.each([[null,'unassessed'],[0,'low'],[39,'low'],[40,'weak'],[59,'weak'],[60,'developing'],[79,'developing'],[80,'strong'],[100,'strong'],[39.49,'low'],[39.5,'weak'],[59.5,'developing'],[79.5,'strong']])('classifies %s as %s',(score,key)=>{expect(masteryLevel(score).key).toBe(key)})});

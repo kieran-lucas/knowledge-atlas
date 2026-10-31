@@ -1,6 +1,6 @@
 [package]
 name = "knowledge-atlas"
-version = "1.0.0"
+version = "1.0.2"
 description = "SPhO Physics Knowledge Mastery"
 edition = "2024"
 rust-version = "1.88"

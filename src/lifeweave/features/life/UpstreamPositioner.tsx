@@ -2,7 +2,6 @@
 import {useEffect,useMemo,useRef,useState,type ReactNode,type KeyboardEvent as ReactKeyboardEvent,type PointerEvent as ReactPointerEvent,type WheelEvent as ReactWheelEvent} from "react";
 import type {LifeEditNodeView} from "../../ipc/generated/LifeEditNodeView";
 import * as styles from "./LifeEditWorkspace.css";
-
 import {TagChipList} from "../tag/TagChipList";
 import {buildLifeTreeLayout,type LayoutPoint} from "./lifeTreeLayout";
 import {Icon,iconDetails,iconLife,iconNote} from "../../design-system/visual/icons";

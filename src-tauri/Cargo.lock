@@ -1673,7 +1673,7 @@ dependencies = [
 
 [[package]]
 name = "knowledge-atlas"
-version = "1.0.0"
+version = "1.0.2"
 dependencies = [
  "tauri",
  "tauri-build",

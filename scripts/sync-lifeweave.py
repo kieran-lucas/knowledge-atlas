@@ -37,6 +37,7 @@ import {useEffect,useMemo,useRef,useState,type ReactNode,type KeyboardEvent as R
 import type {LifeEditNodeView} from "../../ipc/generated/LifeEditNodeView";
 import * as styles from "./LifeEditWorkspace.css";
 import * as atlas from "../../../atlas/atlasTree.css";
+import {useAtlasCamera,type AtlasFocusRequest} from "../../../atlas/useAtlasCamera";
 import {TagChipList} from "../tag/TagChipList";
 import {buildLifeTreeLayout,type LayoutPoint} from "./lifeTreeLayout";
 import {Icon,iconDetails,iconLife,iconNote} from "../../design-system/visual/icons";
@@ -47,7 +48,7 @@ export const buildLifeEditLayout=(nodes:LifeEditNodeView[])=>buildLifeTreeLayout
 '''
 # Copy navigation handlers verbatim rather than implementing a second camera.
 nav=s[s.index(' const startPan='):s.index(' if(query.isLoading)')]
-out=header+'\n'+positioner+'\n'+'''export type FocusRequest={id:string;sequence:number};
+out=header+'\n'+positioner+'\n'+'''export type FocusRequest=AtlasFocusRequest;
 type Props={initialNodeId:string;nodes:LifeEditNodeView[];onOpenNode:(id:string,isLeaf:boolean)=>void;renderState?:(node:LifeEditNodeView)=>ReactNode;renderLeafControls?:(node:LifeEditNodeView)=>ReactNode;focusRequest?:FocusRequest;expandedIds?:Set<string>;immersive?:boolean};
 export function LifeEditWorkspace({initialNodeId,nodes,onOpenNode,renderState,renderLeafControls,focusRequest,expandedIds,immersive=false}:Props){
  const [selectedId,setSelectedId]=useState<string>();const [menuNodeId,setMenuNodeId]=useState<string>();const [zoom,setZoom]=useState(1);
@@ -56,27 +57,32 @@ export function LifeEditWorkspace({initialNodeId,nodes,onOpenNode,renderState,re
 '''
 # Original canvas sizing, initial camera, and outside/Escape selection effects.
 for marker in ['  useEffect(()=>{const el=canvasRef.current;', ' useEffect(()=>{if(initialPositioned.current)', ' useEffect(()=>{if(!menuNodeId)return;']:
- out+=next(line for line in s.splitlines(True) if line.startswith(marker))
+ line=next(line for line in s.splitlines(True) if line.startswith(marker))
+ if 'menuNodeId' not in marker:line=line.replace('useEffect(()=>{','useEffect(()=>{if(immersive)return;',1)
+ out+=line
 out+=''' const lastFocus=useRef<FocusRequest|undefined>(undefined);
- useEffect(()=>{if(!focusRequest||lastFocus.current===focusRequest)return;const point=layout.points.get(focusRequest.id);const viewport=viewportRef.current;if(!point||!viewport)return;lastFocus.current=focusRequest;setSelectedId(focusRequest.id);setMenuNodeId(focusRequest.id);setZoom(1);requestAnimationFrame(()=>{viewport.scrollLeft=Math.max(0,point.x-(viewport.clientWidth-point.width)/2);viewport.scrollTop=Math.max(0,point.y-(viewport.clientHeight-point.height)/2);document.querySelector<HTMLElement>(`[data-life-edit-id="${focusRequest.id}"]`)?.focus({preventScroll:true});});},[focusRequest,layout]);
+ useEffect(()=>{if(immersive||!focusRequest||lastFocus.current===focusRequest)return;const point=layout.points.get(focusRequest.id);const viewport=viewportRef.current;if(!point||!viewport)return;lastFocus.current=focusRequest;setSelectedId(focusRequest.id);setMenuNodeId(focusRequest.id);setZoom(1);requestAnimationFrame(()=>{viewport.scrollLeft=Math.max(0,point.x-(viewport.clientWidth-point.width)/2);viewport.scrollTop=Math.max(0,point.y-(viewport.clientHeight-point.height)/2);document.querySelector<HTMLElement>(`[data-life-edit-id="${focusRequest.id}"]`)?.focus({preventScroll:true});});},[focusRequest,layout]);
 '''
 out+=nav
-out+=''' useEffect(()=>{if(!immersive)return;const viewport=viewportRef.current;if(!viewport)return;
- const fit=()=>changeZoom(Math.min(1,Math.max(.5,Math.min(viewport.clientWidth/layout.width,viewport.clientHeight/layout.height))));
- const shortcuts=(event:KeyboardEvent)=>{if(!(event.ctrlKey||event.metaKey)||event.target instanceof HTMLInputElement)return;if(event.key==='+'||event.key==='='){event.preventDefault();changeZoom(zoom+.1)}else if(event.key==='-'){event.preventDefault();changeZoom(zoom-.1)}else if(event.key==='0'){event.preventDefault();fit()}};
- const wheel=(event:WheelEvent)=>{if(!event.ctrlKey)return;event.preventDefault();changeZoom(zoom+(event.deltaY<0?.1:-.1))};
- window.addEventListener('keydown',shortcuts,true);viewport.addEventListener('wheel',wheel,{passive:false});return()=>{window.removeEventListener('keydown',shortcuts,true);viewport.removeEventListener('wheel',wheel)};
- },[immersive,zoom,layout]);
+out+=''' const camera=useAtlasCamera({enabled:immersive,layout,nodes:projection.nodes,selectedId,viewportRef,canvasRef,focusRequest,onSelect:id=>{setSelectedId(id);setMenuNodeId(id)}});
+ const activePath=new Set<string>();let current=selected;while(current){activePath.add(current.id);current=projection.nodes.find(node=>node.id===current!.parent_id)}
 '''
 # Keep the upstream viewport, SVG links, node mapping, zoom toolbar and status layout.
 jsx=s[s.index(' return <>\n  <span id="life-edit-instructions"'):s.index('   {selected&&editorOpen&&<aside')]
 jsx=jsx.replace('className={styles.workspace}', 'className={`${styles.workspace} ${immersive?atlas.edgeToEdgeWorkspace:""}`}').replace('className={styles.canvasViewport}', 'className={`${styles.canvasViewport} ${immersive?atlas.edgeToEdgeViewport:""}`}')
 jsx=jsx.replace('data-editor-open={editorOpen?"true":"false"}', 'data-editor-open="false"')
+jsx=jsx.replace('onPointerDown={startPan}', 'onPointerDown={event=>{if(immersive)camera.interrupt();startPan(event)}}').replace('onKeyDown={panWithKeyboard}', 'onKeyDown={event=>{if(!immersive||!camera.panKey(event))panWithKeyboard(event)}} onDoubleClick={event=>{if(immersive&&event.target instanceof Element&&!event.target.closest("button,input"))camera.fitAll()}}')
+jsx=jsx.replace('<path key={link.id} d={link.d}/>', '<path key={link.id} d={link.d} data-active={immersive&&activePath.has(link.id)?"true":undefined}/>')
+
 jsx=jsx.replace('Single-click or Space selects a node and shows its actions. Double-click or press Enter to open it. Node drag and drop is disabled; open Edit node to use the explicit Move controls.', 'Click hoặc Space để chọn. Double-click hoặc Enter để mở hoặc thu nhánh. Chọn lá để chấm điểm ngay trên node.')
 start=jsx.index('     {projection.nodes.map(');end=jsx.index('\n    </div>',start)
 jsx=jsx[:start]+'''     {projection.nodes.map(node=><Positioner key={node.id} node={node} point={layout.points.get(node.id)??{x:0,y:0,width:196,height:64}} selected={node.id===selected?.id} menuOpen={node.id===menuNodeId} expanded={expandedIds?.has(node.id)} state={renderState?.(node)} inlineControls={node.is_leaf&&node.id===menuNodeId?renderLeafControls?.(node):undefined} onSelect={()=>{if(selectedId===node.id){setSelectedId(undefined);setMenuNodeId(undefined);return;}setSelectedId(node.id);setMenuNodeId(node.id);}} onOpen={()=>onOpenNode(node.id,node.is_leaf)}/>) }
 '''+jsx[end:]
 jsx=jsx.replace('<div className={styles.zoomControls}', '{!immersive&&<div className={styles.zoomControls}').replace('onClick={centerRoot}>Center</button>\n    </div>', 'onClick={centerRoot}>Center</button>\n    </div>}')
+start=jsx.index('     <svg');end=jsx.index('\n    </div>',start)
+body=jsx[start:end]
+out+=' const treeContent=<>\n'+body+'\n </>;\n'
+jsx=jsx[:start]+'     {immersive?<div className={atlas.world} data-atlas-world="">{treeContent}</div>:treeContent}'+jsx[end:]
 # Titles only: the original controls and camera behaviour are retained.
 jsx=jsx.replace('Full Life tree editor','Cây kiến thức SPhO').replace('Life tree view controls','Điều khiển cây')
 out+=jsx+'   {!immersive&&<p className={styles.status} role="status">{nodes.length} nodes · Double-click / Enter để mở nhánh · Kéo nền để di chuyển</p>}\n  </div>\n </>;\n}\n'
@@ -85,6 +91,7 @@ manifest.append({'source':'frontend/src/features/life/LifeEditWorkspace.tsx','sn
 (target/'docs/lifeweave-renderer.diff').write_text(''.join(difflib.unified_diff(s.splitlines(True),out.splitlines(True),fromfile='LifeWeave/LifeEditWorkspace.tsx',tofile='KnowledgeAtlas/LifeEditWorkspace.tsx')),encoding='utf-8')
 (target/'docs/lifeweave-source-manifest.json').write_text(json.dumps({'sourceCommit':subprocess.check_output(['git','-C',str(source),'rev-parse','HEAD'],text=True).strip(),'files':manifest},indent=2)+'\n',encoding='utf-8')
 # Source renderer for the visual comparison harness, extracted without any adaptation.
-reference=header.replace('import * as atlas from "../../../atlas/atlasTree.css";','')+s[s.index('function Positioner('):s.index('\nexport function LifeEditWorkspace(')].replace('function Positioner(', 'export function UpstreamPositioner(')
+reference_header='\n'.join(line for line in header.splitlines() if 'import * as atlas' not in line and 'import {useAtlasCamera' not in line)+'\n'
+reference=reference_header+s[s.index('function Positioner('):s.index('\nexport function LifeEditWorkspace(')].replace('function Positioner(', 'export function UpstreamPositioner(')
 (target/'src/lifeweave/features/life/UpstreamPositioner.tsx').write_text(reference,encoding='utf-8')
 print(f'Copied {len(files)} original files byte-for-byte, extracted renderer and upstream comparison fixture.')
